@@ -70,7 +70,8 @@ CREATE TABLE Customer (
 );
 
 ```
-![creation of tables](https://github.com/user-attachments/assets/92d073b9-c1d6-4e20-bb84-32feaa594c00)
+![table creation](https://github.com/user-attachments/assets/3f6c5990-9247-4280-a735-5fd83c921f99)
+
 
 
 ### Audit_Log
@@ -84,7 +85,8 @@ CREATE TABLE Audit_Log (
   Status VARCHAR2(10)
 );
 ```
-![audit  table](https://github.com/user-attachments/assets/a4d2d5e1-b3fe-4089-9bd7-4d0d51534499)
+![audit table](https://github.com/user-attachments/assets/55d2be2d-7dfd-4f31-bfec-25f903c36b13)
+
 
 ---
 
@@ -143,7 +145,8 @@ CREATE OR REPLACE PACKAGE BODY ecommerce_pkg AS
 END ecommerce_pkg;
 /
 ```
-![pkg1](https://github.com/user-attachments/assets/320bd78f-69ea-4d1f-8bc1-ece3e3fb51c5)
+![pkg specification](https://github.com/user-attachments/assets/a523fade-7eca-4723-8602-88e01e1e169c)
+
 
 ---
 
@@ -172,20 +175,13 @@ BEGIN
 END;
 /
 ```
-![trigger weekends](https://github.com/user-attachments/assets/302fcbac-dcfa-46a0-b51e-5e24443e8e76)
+![trigger](https://github.com/user-attachments/assets/be62e350-ac45-4bf7-a145-03f94e709608)
+
 
 ---
 
--- Trigger test
-```sql
-UPDATE Product SET Price = 200 WHERE ProductID = 101;
-```
-![procedure success](https://github.com/user-attachments/assets/6a8491d1-d0f4-4d23-b303-4742c3159777)
 
----
 
-## 👨‍🎓 Author
-**Email: macariguervy@gmail.com**
-**GitHub: github.com/RemezoGuervy**
-**AUCA Student – Course Code : INSY 8311 (2024–2025)**
-**Lecturer: Eric Maniraguha**
+##  Contact
+**Email: ihirwenzayisengaines@gmail.com**
+**GitHub: github.com/Inesih**
