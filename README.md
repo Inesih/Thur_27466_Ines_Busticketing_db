@@ -39,12 +39,11 @@ Bus companies face issues such as overbooking, seat conflicts, and manual errors
 ---
 ##  BPMN Diagram
 Helps to so see the Work flow of the System through various processes and how their are conducted
+![BPMN](https://github.com/user-attachments/assets/11e41935-5784-44b8-9510-3241f423901f)
+
 
 ---
-##  ERD Diagram
-Shows the Databse Schem how tables are related in other words  their Relationship 
 
----
 ##  OEM Diagram
 The OEM Helped  me to live Monitor my Database through all the process i used Oracle Enteprise with a port number of 5505
 ![OEM](https://github.com/user-attachments/assets/1ad0c604-204d-432b-8d45-29effb1286f7)
@@ -60,14 +59,13 @@ I first created the Pluggable Database which is Mon_27483_Guervy_EcommercePlatfo
 
 ### creation example of one of the tables 
 ```sql
-CREATE TABLE Customer (
-  CustomerID NUMBER PRIMARY KEY,
-  FullName VARCHAR2(100),
-  Email VARCHAR2(100),
-  Password VARCHAR2(100),
-  Phone VARCHAR2(20),
-  Address VARCHAR2(255)
+CREATE TABLE Bus (
+  BusID NUMBER PRIMARY KEY,
+  PlateNumber VARCHAR2(20),
+  Capacity NUMBER,
+  Status VARCHAR2(20)
 );
+
 
 ```
 ![table creation](https://github.com/user-attachments/assets/3f6c5990-9247-4280-a735-5fd83c921f99)
@@ -84,66 +82,63 @@ CREATE TABLE Audit_Log (
   Operation VARCHAR2(10),
   Status VARCHAR2(10)
 );
+
 ```
 ![audit table](https://github.com/user-attachments/assets/55d2be2d-7dfd-4f31-bfec-25f903c36b13)
 
 
 ---
 
-## ⚙️ PL/SQL Package: ecommerce_pkg
+## ⚙️ PL/SQL Package: bus_pkg
 
 ### Specification
 ```sql
-CREATE OR REPLACE PACKAGE ecommerce_pkg AS
-  PROCEDURE Place_Order(p_customer_id IN NUMBER, p_product_id IN NUMBER, p_quantity IN NUMBER);
-  FUNCTION Get_Total_Spent_By_Customer(p_customer_id IN NUMBER) RETURN NUMBER;
-  TYPE pending_orders_cursor IS REF CURSOR;
-  FUNCTION Get_Pending_Orders RETURN pending_orders_cursor;
-END ecommerce_pkg;
+CREATE OR REPLACE PACKAGE bus_pkg AS
+  PROCEDURE Book_Ticket(p_passenger_id IN NUMBER, p_trip_id IN NUMBER, p_seat_number IN NUMBER);
+  FUNCTION Get_Total_Paid_By_Passenger(p_passenger_id IN NUMBER) RETURN NUMBER;
+END;
 /
 
+
 ### Body
-CREATE OR REPLACE PACKAGE BODY ecommerce_pkg AS
-  PROCEDURE Place_Order(p_customer_id IN NUMBER, p_product_id IN NUMBER, p_quantity IN NUMBER) IS
-    v_price Product.Price%TYPE;
-    v_subtotal NUMBER;
-    v_order_id NUMBER;
-    v_orderitem_id NUMBER;
+CREATE OR REPLACE PACKAGE BODY bus_pkg AS
+
+  PROCEDURE Book_Ticket(p_passenger_id IN NUMBER, p_trip_id IN NUMBER, p_seat_number IN NUMBER) IS
+    v_ticket_id NUMBER;
+    v_fare NUMBER;
   BEGIN
-    SELECT Price INTO v_price FROM Product WHERE ProductID = p_product_id;
-    v_subtotal := v_price * p_quantity;
-    SELECT NVL(MAX(OrderID), 0) + 1 INTO v_order_id FROM Orders;
+    SELECT Fare INTO v_fare FROM Trip WHERE TripID = p_trip_id;
+    SELECT NVL(MAX(TicketID), 0) + 1 INTO v_ticket_id FROM Ticket;
 
-    INSERT INTO Orders(OrderID, CustomerID, OrderDate, TotalAmount, Status)
-    VALUES (v_order_id, p_customer_id, SYSDATE, v_subtotal, 'Pending');
+    INSERT INTO Ticket (TicketID, PassengerID, TripID, SeatNumber, BookingDate)
+    VALUES (v_ticket_id, p_passenger_id, p_trip_id, p_seat_number, SYSDATE);
 
-    SELECT NVL(MAX(OrderItemID), 0) + 1 INTO v_orderitem_id FROM OrderItem;
-    INSERT INTO OrderItem(OrderItemID, OrderID, ProductID, Quantity, Subtotal)
-    VALUES (v_orderitem_id, v_order_id, p_product_id, p_quantity, v_subtotal);
+    INSERT INTO Payment (PaymentID, TicketID, Amount, PaymentDate, PaymentMethod)
+    VALUES (v_ticket_id, v_ticket_id, v_fare, SYSDATE, 'Cash');
 
     COMMIT;
-    DBMS_OUTPUT.PUT_LINE('Order placed successfully. Order ID: ' || v_order_id);
+    DBMS_OUTPUT.PUT_LINE('Ticket booked: ' || v_ticket_id);
   EXCEPTION
     WHEN OTHERS THEN
       ROLLBACK;
       DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
   END;
 
-  FUNCTION Get_Total_Spent_By_Customer(p_customer_id IN NUMBER) RETURN NUMBER IS
+  FUNCTION Get_Total_Paid_By_Passenger(p_passenger_id IN NUMBER) RETURN NUMBER IS
     v_total NUMBER;
   BEGIN
-    SELECT NVL(SUM(TotalAmount), 0) INTO v_total FROM Orders WHERE CustomerID = p_customer_id;
+    SELECT NVL(SUM(p.Amount), 0)
+    INTO v_total
+    FROM Payment p
+    JOIN Ticket t ON p.TicketID = t.TicketID
+    WHERE t.PassengerID = p_passenger_id;
+
     RETURN v_total;
   END;
 
-  FUNCTION Get_Pending_Orders RETURN pending_orders_cursor IS
-    c_pending_orders pending_orders_cursor;
-  BEGIN
-    OPEN c_pending_orders FOR SELECT * FROM Orders WHERE Status = 'Pending';
-    RETURN c_pending_orders;
-  END;
-END ecommerce_pkg;
+END bus_pkg;
 /
+
 ```
 ![pkg specification](https://github.com/user-attachments/assets/a523fade-7eca-4723-8602-88e01e1e169c)
 
@@ -154,26 +149,34 @@ END ecommerce_pkg;
 - Blocks DML actions on the `Schedule` table from Monday to Friday.
 - Checks a `Holiday` table to block actions on specific holidays.
 - Actions are logged in the `Audit_Log` table with status and timestamp.
-In his trigger Helps Us to REstrict Modification of Data in Weekends
+In this trigger Helps Us to REstrict Modification of Data in Weekends
 ```sql
-CREATE OR REPLACE TRIGGER trg_restrict_product_dml
-BEFORE INSERT OR UPDATE OR DELETE ON Product
+CREATE OR REPLACE TRIGGER trg_restrict_ticket_dml
+BEFORE INSERT OR UPDATE OR DELETE ON Ticket
 FOR EACH ROW
 DECLARE
   v_holiday_count NUMBER;
 BEGIN
-  SELECT COUNT(*) INTO v_holiday_count FROM Holiday WHERE HolidayDate = TRUNC(SYSDATE);
-  IF TO_CHAR(SYSDATE, 'DY', 'NLS_DATE_LANGUAGE=ENGLISH') IN ('MON', 'TUE', 'WED', 'THU', 'FRI')
+  SELECT COUNT(*) INTO v_holiday_count
+  FROM Holiday
+  WHERE HolidayDate = TRUNC(SYSDATE);
+
+  IF TO_CHAR(SYSDATE, 'DY', 'NLS_DATE_LANGUAGE=ENGLISH') IN ('SAT', 'SUN')
      OR v_holiday_count > 0 THEN
+
+    -- Log the denied attempt
     INSERT INTO Audit_Log (UserID, ActionDate, TableName, Operation, Status)
-    VALUES (USER, SYSDATE, 'Product', ORA_SYSEVENT, 'Denied');
-    RAISE_APPLICATION_ERROR(-20001, 'DML operations on Product are restricted on weekdays and holidays.');
+    VALUES (USER, SYSDATE, 'Ticket', ORA_SYSEVENT, 'Denied');
+
+    RAISE_APPLICATION_ERROR(-20002, 'Modifications to Ticket table are not allowed on weekends or holidays.');
   ELSE
+    -- Log the allowed action
     INSERT INTO Audit_Log (UserID, ActionDate, TableName, Operation, Status)
-    VALUES (USER, SYSDATE, 'Product', ORA_SYSEVENT, 'Allowed');
+    VALUES (USER, SYSDATE, 'Ticket', ORA_SYSEVENT, 'Allowed');
   END IF;
 END;
 /
+
 ```
 ![trigger](https://github.com/user-attachments/assets/be62e350-ac45-4bf7-a145-03f94e709608)
 
