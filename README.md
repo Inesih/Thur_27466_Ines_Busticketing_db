@@ -1,4 +1,4 @@
-# 🛒 BusTicketing Platform – Oracle PL/SQL Capstone Project
+#  BusTicketing Platform – Oracle PL/SQL Capstone Project
 
 # 🎓 Student Information  
 **Name:** Ihirwe Nzayisenga Ines  
