@@ -39,17 +39,16 @@ Bus companies face issues such as overbooking, seat conflicts, and manual errors
 ---
 ##  BPMN Diagram
 Helps to so see the Work flow of the System through various processes and how their are conducted
-![BPMN](https://github.com/user-attachments/assets/d4ee6e4e-b912-450c-984d-5c10c567f2b8)
 
 ---
 ##  ERD Diagram
 Shows the Databse Schem how tables are related in other words  their Relationship 
-![ERD](https://github.com/user-attachments/assets/9721ac11-2e2c-4e24-930b-23628e32aca1)
 
 ---
 ##  OEM Diagram
 The OEM Helped  me to live Monitor my Database through all the process i used Oracle Enteprise with a port number of 5505
-![OEM](https://github.com/user-attachments/assets/6e23b751-718b-45ff-bede-b78d3dbca2ce)
+![OEM](https://github.com/user-attachments/assets/1ad0c604-204d-432b-8d45-29effb1286f7)
+
 
 
 ##  Setup Guide  
