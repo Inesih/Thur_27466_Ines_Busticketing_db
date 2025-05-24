@@ -20,8 +20,8 @@ Bus companies face issues such as overbooking, seat conflicts, and manual errors
 - 
 ---
 ## Solution Provide:
-✔ **Real-time order processing**  
-✔ **Automated inventory control**  
+✔ **Real-time Ticket processing**  
+✔ **Automated Route  control**  
 ✔ **Business rule enforcement**  
 ✔ **Comprehensive activity auditing**  
 
