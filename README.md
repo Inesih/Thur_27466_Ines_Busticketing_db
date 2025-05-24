@@ -39,7 +39,8 @@ Bus companies face issues such as overbooking, seat conflicts, and manual errors
 ---
 ##  BPMN Diagram
 Helps to so see the Work flow of the System through various processes and how their are conducted
-![BPMN](https://github.com/user-attachments/assets/11e41935-5784-44b8-9510-3241f423901f)
+![BPMN](https://github.com/user-attachments/assets/039a20f8-9869-483b-9e31-35915724666d)
+
 
 
 ---
@@ -51,8 +52,9 @@ The OEM Helped  me to live Monitor my Database through all the process i used Or
 
 
 ##  Setup Guide  
-I first created the Pluggable Database which is Mon_27483_Guervy_EcommercePlatform_DB
-![Creation of PDB](https://github.com/user-attachments/assets/2e77b512-d6e6-4a7c-916d-7839aed686bb)
+I first created the Pluggable Database which is Thur_27466_Ines_Busticketing_db
+![pluggable](https://github.com/user-attachments/assets/d51feb91-92c6-4f46-9b60-88f2f4d70fca)
+
 
  
 ## 🗃️ Database Tables
